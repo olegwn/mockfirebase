@@ -3,7 +3,6 @@
 var _        = require('lodash');
 var Slice    = require('./slice');
 var utils    = require('./utils');
-var validate = require('./validators');
 
 function MockQuery (ref) {
   this.ref = function () {
@@ -35,7 +34,6 @@ MockQuery.prototype.getData = function () {
 };
 
 MockQuery.prototype.fakeEvent = function (event, snapshot) {
-  validate.event(event);
   _(this._events)
     .filter(function (parts) {
       return parts[0] === event;
@@ -46,7 +44,6 @@ MockQuery.prototype.fakeEvent = function (event, snapshot) {
 };
 
 MockQuery.prototype.on = function (event, callback, cancelCallback, context) {
-  validate.event(event);
   if (arguments.length === 3 && typeof cancelCallback !== 'function') {
     context = cancelCallback;
     cancelCallback = _.noop;
@@ -87,6 +84,8 @@ MockQuery.prototype.on = function (event, callback, cancelCallback, context) {
       case 'child_changed':
         callback.call(context, snap);
         break;
+      default:
+        throw new Error('Invalid event: ' + event);
     }
 
     if (map) {
@@ -117,7 +116,6 @@ MockQuery.prototype.off = function (event, callback, context) {
 };
 
 MockQuery.prototype.once = function (event, callback, context) {
-  validate.event(event);
   var self = this;
   // once is tricky because we want the first match within our range
   // so we use the on() method above which already does the needed legwork
@@ -135,6 +133,24 @@ MockQuery.prototype.limit = function (intVal) {
   }
   var q = new MockQuery(this.ref());
   _.extend(q._q, this._q, {limit: intVal});
+  return q;
+};
+
+MockQuery.prototype.orderByChild = function (child) {
+  if( typeof child !== 'string' ) {
+    throw new Error('Query.orderByChild: Argument must be a string.');
+  }
+  var q = new MockQuery(this.ref());
+  _.extend(q._q, this._q, {orderByChild: child});
+  return q;
+};
+
+MockQuery.prototype.equalTo = function (value) {
+  if( typeof value !== 'string' ) {
+    throw new Error('Query.equalTo: Argument must be a string.');
+  }
+  var q = new MockQuery(this.ref());
+  _.extend(q._q, this._q, {equalTo: value});
   return q;
 };
 

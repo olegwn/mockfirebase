@@ -8,7 +8,6 @@ var Snapshot = require('./snapshot');
 var Queue    = require('./queue').Queue;
 var utils    = require('./utils');
 var Auth     = require('./auth');
-var validate = require('./validators');
 
 function MockFirebase (path, data, parent, name) {
   this.path = path || 'Mock://';
@@ -107,7 +106,6 @@ MockFirebase.prototype.getKeys = function () {
 };
 
 MockFirebase.prototype.fakeEvent = function (event, key, data, prevChild, priority) {
-  validate.event(event);
   if (arguments.length < 5) priority = null;
   if (arguments.length < 4) prevChild = null;
   if (arguments.length < 3) data = null;
@@ -226,7 +224,6 @@ MockFirebase.prototype.push = function (data, callback) {
 };
 
 MockFirebase.prototype.once = function (event, callback, cancel, context) {
-  validate.event(event);
   if (arguments.length === 3 && !_.isFunction(cancel)) {
     context = cancel;
     cancel = _.noop;
@@ -259,7 +256,6 @@ MockFirebase.prototype.remove = function (callback) {
 };
 
 MockFirebase.prototype.on = function (event, callback, cancel, context) {
-  validate.event(event);
   if (arguments.length === 3 && typeof cancel !== 'function') {
     context = cancel;
     cancel = _.noop;
@@ -287,20 +283,17 @@ MockFirebase.prototype.off = function (event, callback, context) {
       }
     }
   }
+  else if (callback) {
+    var events = this._events[event];
+    var newEvents = this._events[event] = [];
+    _.each(events, function (parts) {
+      if (parts[0] !== callback || parts[1] !== context) {
+        newEvents.push(parts);
+      }
+    });
+  }
   else {
-    validate.event(event);
-    if (callback) {
-      var events = this._events[event];
-      var newEvents = this._events[event] = [];
-      _.each(events, function (parts) {
-        if (parts[0] !== callback || parts[1] !== context) {
-          newEvents.push(parts);
-        }
-      });
-    }
-    else {
-      this._events[event] = [];      
-    }
+    this._events[event] = [];
   }
 };
 
@@ -323,6 +316,22 @@ MockFirebase.prototype./**
  */
 limit = function (limit) {
   return new Query(this).limit(limit);
+};
+
+MockFirebase.prototype./**
+ * Just a stub at this point.
+ * @param {string} child
+ */
+orderByChild = function (child) {
+  return new Query(this).orderByChild(child);
+};
+
+MockFirebase.prototype./**
+ * Just a stub at this point.
+ * @param {string} value
+ */
+equalTo = function (value) {
+  return new Query(this).equalTo(value);
 };
 
 MockFirebase.prototype.startAt = function (priority, key) {
