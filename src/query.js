@@ -136,6 +136,15 @@ MockQuery.prototype.limit = function (intVal) {
   return q;
 };
 
+MockQuery.prototype.limitToLast = function (intVal) {
+  if( typeof intVal !== 'number' ) {
+    throw new Error('Query.limitToLast: First argument must be a positive integer.');
+  }
+  var q = new MockQuery(this.ref());
+  _.extend(q._q, this._q, {limitToLast: intVal});
+  return q;
+};
+
 MockQuery.prototype.orderByChild = function (child) {
   if( typeof child !== 'string' ) {
     throw new Error('Query.orderByChild: Argument must be a string.');

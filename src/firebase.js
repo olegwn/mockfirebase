@@ -320,6 +320,14 @@ limit = function (limit) {
 
 MockFirebase.prototype./**
  * Just a stub at this point.
+ * @param {int} limit
+ */
+limitToLast = function (limit) {
+  return new Query(this).limitToLast(limit);
+};
+
+MockFirebase.prototype./**
+ * Just a stub at this point.
  * @param {string} child
  */
 orderByChild = function (child) {
