@@ -163,10 +163,10 @@ MockQuery.prototype.equalTo = function (value) {
   return q;
 };
 
-MockQuery.prototype.startAt = function (priority, key) {
-  assertQuery('Query.startAt', priority, key);
+MockQuery.prototype.startAt = function (value, key) {
+  assertQuery('Query.startAt', value, key);
   var q = new MockQuery(this.ref());
-  _.extend(q._q, this._q, {startKey: key, startPri: priority});
+  _.extend(q._q, this._q, {startAt: value});
   return q;
 };
 
