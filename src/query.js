@@ -155,9 +155,6 @@ MockQuery.prototype.orderByChild = function (child) {
 };
 
 MockQuery.prototype.equalTo = function (value) {
-  if( typeof value !== 'string' ) {
-    throw new Error('Query.equalTo: Argument must be a string.');
-  }
   var q = new MockQuery(this.ref());
   _.extend(q._q, this._q, {equalTo: value});
   return q;
